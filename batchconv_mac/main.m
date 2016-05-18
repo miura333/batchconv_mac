@@ -19,6 +19,12 @@ int main(int argc, const char * argv[]) {
         const char *ratio_a = argv[2];
         double ratio = atof(ratio_a);
         
+        NSString *suffix = nil;
+        if(argc == 4) {
+            const char *suffix_a = argv[3];
+            suffix = [NSString stringWithUTF8String:suffix_a];
+        }
+        
         NSError *error = nil;
         NSArray *array1 = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dir error:&error];
         if(error != nil) {
@@ -42,7 +48,15 @@ int main(int argc, const char * argv[]) {
         for(i = 0; i < [array2 count]; i++) {
             NSString *fileName = [array2 objectAtIndex:i];
             NSString *path = [dir stringByAppendingPathComponent:fileName];
-            NSString *output_path = [output_dir stringByAppendingPathComponent:fileName];
+            NSString *output_path;
+            if(suffix == nil) {
+                output_path = [output_dir stringByAppendingPathComponent:fileName];
+            }else{
+                NSString *fileNameNoExt = [fileName stringByDeletingPathExtension];
+                NSString *fileName2 = [NSString stringWithFormat:@"%@%@.%@", fileNameNoExt, suffix, [fileName pathExtension]];
+                output_path = [output_dir stringByAppendingPathComponent:fileName2];
+            }
+            
             [convCore convImage:path output_path:output_path ratio:ratio];
         }
     }
